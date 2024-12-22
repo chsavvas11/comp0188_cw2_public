@@ -85,8 +85,8 @@ class TrainSingleEpoch:
         for i, vals in range_gen:
 
             # STUDENT CODE: Print dictionary keys for debugging
-            print(f"Batch {i} - Input keys: {list(vals.input.keys())}")
-            print(f"Batch {i} - Output keys: {list(vals.output.keys())}")
+            print(f"Batch {i} - Input keys: {list(vals.input.keys())}\n")
+            print(f"Batch {i} - Output keys: {list(vals.output.keys())}\n")
 
             input_vals = vals.input
             output_vals = vals.output
@@ -115,8 +115,8 @@ class TrainSingleEpoch:
             if self.cache_preds:
 
                 # STUDENT CODE: Print dictionary keys for debugging
-                print(f"Batch {i} - Model output keys: {list(output.keys())}")
-                print(f"Batch {i} - Actual output keys: {list(output_vals.keys())}")
+                print(f"Batch {i} - Model output keys: {list(output.keys())}\n")
+                print(f"Batch {i} - Actual output keys: {list(output_vals.keys())}\n")
 
                 preds.append({k:output[k].detach().cpu() for k in output.keys()})
             
@@ -144,8 +144,8 @@ class TrainSingleEpoch:
         if self.cache_preds:
 
             # STUDENT CODE: Print dictionary keys for debugging
-            print(f"Predictions keys: {list(preds[0].keys())}")
-            print(f"Actuals keys: {list(actuals[0].keys())}")
+            print(f"Predictions keys: {list(preds[0].keys())}\n")
+            print(f"Actuals keys: {list(actuals[0].keys())}\n")
 
             for k in preds[0].keys():
                 _prd_lst[k] = torch.concat([t[k] for t in preds],dim=0)
@@ -160,12 +160,12 @@ class TrainSingleEpoch:
         losses = losses/denom
 
         # STUDENT CODE: Print shapes for debugging
-        print(f"Shape of _act_lst['grp']: {_act_lst['grp'].shape}")
-        print(f"Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}")
-        print(f"Type of _act_lst['grp']: {type(_act_lst['grp'])}")
-        print(f"Type of _prd_lst['grp']: {type(_prd_lst['grp'])}")
-        print(f"First few _act_lst['grp']: {_act_lst['grp'][:5]}")
-        print(f"First few _prd_lst['grp']: {_prd_lst['grp'][:5]}")
+        print(f"Shape of _act_lst['grp']: {_act_lst['grp'].shape}\n")
+        print(f"Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}\n")
+        print(f"Type of _act_lst['grp']: {type(_act_lst['grp'])}\n")
+        print(f"Type of _prd_lst['grp']: {type(_prd_lst['grp'])}\n")
+        print(f"First few _act_lst['grp']: {_act_lst['grp'][:5]}\n")
+        print(f"First few _prd_lst['grp']: {_prd_lst['grp'][:5]}\n")
 
         # STUDENT CODE: Convert classification predictions for metrics
         if "grp" in _prd_lst:
@@ -175,8 +175,8 @@ class TrainSingleEpoch:
                 _act_lst["grp"] = torch.argmax(_act_lst["grp"], dim=1)
 
         # STUDENT CODE: Print shapes after conversions
-        print(f"After conversion - Shape of _act_lst['grp']: {_act_lst['grp'].shape}")
-        print(f"After conversion - Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}")
+        print(f"After conversion - Shape of _act_lst['grp']: {_act_lst['grp'].shape}\n")
+        print(f"After conversion - Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}\n")
 
         # STUDENT CODE: Compute metrics
         metrics = {}
