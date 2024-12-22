@@ -93,6 +93,19 @@ def train(
         rll_trans={}
         )
     
+    # STUDENT CODE: Add new metrics
+    metric_keys = [
+        # pos metrics
+        "epoch_train_mse_pos", "epoch_val_mse_pos",
+        "epoch_train_r2_pos", "epoch_val_r2_pos",
+        # grp metrics
+        "epoch_train_accuracy_grp", "epoch_val_accuracy_grp",
+        "epoch_train_precision_grp", "epoch_val_precision_grp",
+        "epoch_train_recall_grp", "epoch_val_recall_grp"
+    ]
+    for metric_key in metric_keys:
+        mo.add_metric(metric_key, rll_trans={})
+    
     logger.info("Running epochs: {}".format(epochs))
     # Add model to cuda device
     if gpu:
@@ -104,14 +117,14 @@ def train(
 
     for epoch in np.arange(1,epochs+1):
         logger.info("Running training epoch")
-        train_loss_val, train_preds =  train_epoch_func(
+        train_loss_val, train_preds, train_metrics =  train_epoch_func(
             model=model, data_loader=train_data_loader, gpu=gpu,
             optimizer=optimizer, criterion=criterion,logger=logger)
         epoch_train_loss = train_loss_val.numpy()
 
         logger.info("epoch {}\t training loss : {}".format(
                 epoch, epoch_train_loss))
-        val_loss_val, val_preds = val_epoch_func(
+        val_loss_val, val_preds, val_metrics = val_epoch_func(
             model=model, data_loader=val_data_loader, gpu=gpu,
             criterion=val_criterion)
 
@@ -124,7 +137,21 @@ def train(
             "epoch_train_loss":{"label":"epoch_{}".format(epoch),
                                 "value":epoch_train_loss},
             "epoch_val_loss":{"label":"epoch_{}".format(epoch),
-                            "value":epoch_val_loss}
+                            "value":epoch_val_loss},
+                            
+            # STUDENT CODE: Log new metrics
+            "epoch_train_loss": {"label": f"epoch_{epoch}", "value": epoch_train_loss},
+            "epoch_val_loss": {"label": f"epoch_{epoch}", "value": epoch_val_loss},
+            "epoch_train_mse_pos": {"label": f"epoch_{epoch}", "value": train_metrics["mse_pos"]},
+            "epoch_val_mse_pos": {"label": f"epoch_{epoch}", "value": val_metrics["mse_pos"]},
+            "epoch_train_r2_pos": {"label": f"epoch_{epoch}", "value": train_metrics["r2_pos"]},
+            "epoch_val_r2_pos": {"label": f"epoch_{epoch}", "value": val_metrics["r2_pos"]},
+            "epoch_train_accuracy_grp": {"label": f"epoch_{epoch}", "value": train_metrics["accuracy_grp"]},
+            "epoch_val_accuracy_grp": {"label": f"epoch_{epoch}", "value": val_metrics["accuracy_grp"]},
+            "epoch_train_precision_grp": {"label": f"epoch_{epoch}", "value": train_metrics["precision_grp"]},
+            "epoch_val_precision_grp": {"label": f"epoch_{epoch}", "value": val_metrics["precision_grp"]},
+            "epoch_train_recall_grp": {"label": f"epoch_{epoch}", "value": train_metrics["recall_grp"]},
+            "epoch_val_recall_grp": {"label": f"epoch_{epoch}", "value": val_metrics["recall_grp"]},
         })
 
         if scheduler:

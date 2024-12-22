@@ -8,6 +8,9 @@ from pymlrf.types import (
     GenericDataLoaderProtocol
     )
 
+# STUDENT CODE: Import metric utils
+from sklearn.metrics import r2_score, mean_squared_error, accuracy_score, precision_score, recall_score
+
 class ValidateSingleEpoch:
     
     def __init__(
@@ -61,6 +64,10 @@ class ValidateSingleEpoch:
             denom = denom.half()
         model.eval()
         preds = []
+
+        # STUDENT CODE: Define array for actual values
+        actuals = []
+
         with torch.no_grad():
             for i, vals in enumerate(data_loader):
 
@@ -95,9 +102,38 @@ class ValidateSingleEpoch:
                 denom += 1
                 if self.cache_preds:
                     preds.append({k:output[k].detach().cpu() for k in output.keys()})
+
+                    # STUDENT CODE: Keep track of actual value for each prediction
+                    actuals.append({k: output_vals[k].detach().cpu() for k in output_vals.keys()})
+
         _prd_lst = {}
+
+        # STUDENT CODE: Define dictionary for truth values for comparison
+        _act_lst = {}
+
         if self.cache_preds:
             for k in preds[0].keys():
                 _prd_lst[k] = torch.concat([t[k] for t in preds],dim=0)
+
+                # STUDENT CODE: Append actual value to dictionary
+                _act_lst[k] = torch.concat([t[k] for t in actuals], dim=0)
+
         losses = losses/denom
-        return losses, _prd_lst
+
+        # STUDENT CODE: Compute metrics
+        metrics = {}
+        metrics["r2_pos"] = r2_score(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
+        metrics["mse_pos"] = mean_squared_error(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
+        metrics["accuracy_grp"] = accuracy_score(_act_lst["grp"].numpy(), _prd_lst["grp"].numpy())
+        metrics["precision_grp"] = precision_score(
+            _act_lst["grp"].numpy(), 
+            _prd_lst["grp"].numpy(), 
+            average="weighted"
+        )
+        metrics["recall_grp"] = recall_score(
+            _act_lst["grp"].numpy(), 
+            _prd_lst["grp"].numpy(), 
+            average="weighted"
+        )
+
+        return losses, _prd_lst, metrics
