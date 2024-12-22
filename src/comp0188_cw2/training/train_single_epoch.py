@@ -159,10 +159,24 @@ class TrainSingleEpoch:
         
         losses = losses/denom
 
+        # STUDENT CODE: Print shapes for debugging
+        print(f"Shape of _act_lst['grp']: {_act_lst['grp'].shape}")
+        print(f"Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}")
+        print(f"Type of _act_lst['grp']: {type(_act_lst['grp'])}")
+        print(f"Type of _prd_lst['grp']: {type(_prd_lst['grp'])}")
+        print(f"First few _act_lst['grp']: {_act_lst['grp'][:5]}")
+        print(f"First few _prd_lst['grp']: {_prd_lst['grp'][:5]}")
+
         # STUDENT CODE: Convert classification predictions for metrics
         if "grp" in _prd_lst:
-            _prd_lst["grp"] = torch.argmax(_prd_lst["grp"], dim=1)
-            _act_lst["grp"] = torch.argmax(_act_lst["grp"], dim=1)
+            if len(_prd_lst["grp"].shape) > 1:  # Predicted probabilities/logits
+                _prd_lst["grp"] = torch.argmax(_prd_lst["grp"], dim=1)
+            if len(_act_lst["grp"].shape) > 1:  # One-hot encoded ground truth
+                _act_lst["grp"] = torch.argmax(_act_lst["grp"], dim=1)
+
+        # STUDENT CODE: Print shapes after conversions
+        print(f"After conversion - Shape of _act_lst['grp']: {_act_lst['grp'].shape}")
+        print(f"After conversion - Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}")
 
         # STUDENT CODE: Compute metrics
         metrics = {}
