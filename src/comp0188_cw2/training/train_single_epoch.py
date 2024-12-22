@@ -84,6 +84,10 @@ class TrainSingleEpoch:
             )
         for i, vals in range_gen:
 
+            # STUDENT CODE: Print dictionary keys for debugging
+            print(f"Batch {i} - Input keys: {list(vals.input.keys())}")
+            print(f"Batch {i} - Output keys: {list(vals.output.keys())}")
+
             input_vals = vals.input
             output_vals = vals.output
             if gpu:
@@ -109,6 +113,11 @@ class TrainSingleEpoch:
                 output = model(**input_vals)
                 train_loss = criterion(output, output_vals)
             if self.cache_preds:
+
+                # STUDENT CODE: Print dictionary keys for debugging
+                print(f"Batch {i} - Model output keys: {list(output.keys())}")
+                print(f"Batch {i} - Actual output keys: {list(output_vals.keys())}")
+
                 preds.append({k:output[k].detach().cpu() for k in output.keys()})
             
                 # STUDENT CODE: Keep track of actual value for each prediction
@@ -133,12 +142,20 @@ class TrainSingleEpoch:
         _act_lst = {}
 
         if self.cache_preds:
+
+            # STUDENT CODE: Print dictionary keys for debugging
+            print(f"Predictions keys: {list(preds[0].keys())}")
+            print(f"Actuals keys: {list(actuals[0].keys())}")
+
             for k in preds[0].keys():
                 _prd_lst[k] = torch.concat([t[k] for t in preds],dim=0)
         
                 # STUDENT CODE: Append actual value to dictionary
                 _act_lst[k] = torch.concat([t[k] for t in actuals], dim=0)
 
+        # STUDENT CODE: Print dictionary keys for debugging
+        print(f"Final Predictions keys: {list(_prd_lst.keys())}")
+        print(f"Final Actuals keys: {list(_act_lst.keys())}")
         
         losses = losses/denom
 
