@@ -159,6 +159,11 @@ class TrainSingleEpoch:
         
         losses = losses/denom
 
+        # STUDENT CODE: Convert classification predictions for metrics
+        if "grp" in _prd_lst:
+            _prd_lst["grp"] = torch.argmax(_prd_lst["grp"], dim=1)
+            _act_lst["grp"] = torch.argmax(_act_lst["grp"], dim=1)
+
         # STUDENT CODE: Compute metrics
         metrics = {}
         metrics["r2_pos"] = r2_score(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
