@@ -169,14 +169,22 @@ class TrainSingleEpoch:
 
         # STUDENT CODE: Convert classification predictions for metrics
         if "grp" in _prd_lst:
+
             if len(_prd_lst["grp"].shape) > 1:  # Predicted probabilities/logits
                 _prd_lst["grp"] = torch.argmax(_prd_lst["grp"], dim=1)
             if len(_act_lst["grp"].shape) > 1:  # One-hot encoded ground truth
                 _act_lst["grp"] = torch.argmax(_act_lst["grp"], dim=1)
 
+            print(f"Unique values in _prd_lst['grp']: {torch.unique(_prd_lst['grp'])}")
+            print(f"Data type of _prd_lst['grp']: {_prd_lst['grp'].dtype}")
+            print(f"Unique values in _act_lst['grp']: {torch.unique(_act_lst['grp'])}")
+            print(f"Data type of _act_lst['grp']: {_act_lst['grp'].dtype}")
+
         # STUDENT CODE: Print shapes after conversions
         print(f"After conversion - Shape of _act_lst['grp']: {_act_lst['grp'].shape}\n")
         print(f"After conversion - Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}\n")
+        print(f"After conversion - First few _act_lst['grp']: {_act_lst['grp'][:5]}\n")
+        print(f"After conversion - First few _prd_lst['grp']: {_prd_lst['grp'][:5]}\n")
 
         # STUDENT CODE: Compute metrics
         metrics = {}
