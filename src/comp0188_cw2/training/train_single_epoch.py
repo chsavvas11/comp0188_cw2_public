@@ -1,5 +1,6 @@
 
 import torch
+import numpy as np
 from typing import Dict, Tuple
 import logging
 from tqdm import tqdm
@@ -191,20 +192,30 @@ class TrainSingleEpoch:
         # STUDENT CODE: Compute metrics
         metrics = {}
 
-        int_act_grp = _act_lst["grp"].numpy().astype(int)
-        int_prd_grp = _prd_lst["grp"].numpy().astype(int)
-
         metrics["r2_pos"] = r2_score(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
         metrics["mse_pos"] = mean_squared_error(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
-        metrics["accuracy_grp"] = accuracy_score(int_act_grp, int_prd_grp)
+
+        # Convert tensors to int64 numpy arrays
+        y_true = _act_lst["grp"].numpy().astype(np.int64)
+        y_pred = _prd_lst["grp"].numpy().astype(np.int64)
+
+        # Print shapes and values for debugging
+        print("Debug - y_true shape:", y_true.shape)
+        print("Debug - y_pred shape:", y_pred.shape)
+        print("Debug - y_true first few values:", y_true[:5])
+        print("Debug - y_pred first few values:", y_pred[:5])
+        print("Debug - y_true unique values:", np.unique(y_true))
+        print("Debug - y_pred unique values:", np.unique(y_pred))
+
+        metrics["accuracy_grp"] = accuracy_score(y_true, y_pred)
         metrics["precision_grp"] = precision_score(
-            int_act_grp, 
-            int_prd_grp, 
+            y_true, 
+            y_pred, 
             average="weighted"
         )
         metrics["recall_grp"] = recall_score(
-            int_act_grp, 
-            int_prd_grp, 
+            y_true, 
+            y_pred, 
             average="weighted"
         )
 
