@@ -101,22 +101,30 @@ class ValidateSingleEpoch:
                 losses += val_loss.detach().cpu()
                 denom += 1
                 if self.cache_preds:
-                    preds.append({k:output[k].detach().cpu() for k in output.keys()})
+                    # STUDENT CODE: Commented out as it is ran anyway for metric collection
+                    pass
+                    # preds.append({k:output[k].detach().cpu() for k in output.keys()})
 
-                    # STUDENT CODE: Keep track of actual value for each prediction
-                    actuals.append({k: output_vals[k].detach().cpu() for k in output_vals.keys()})
+                # STUDENT CODE: Keep track of prediction and actual values for each prediction
+                preds.append({k:output[k].detach().cpu() for k in output.keys()})
+                actuals.append({k: output_vals[k].detach().cpu() for k in output_vals.keys()})
+
 
         _prd_lst = {}
 
         # STUDENT CODE: Define dictionary for truth values for comparison
         _act_lst = {}
 
-        if self.cache_preds:
-            for k in preds[0].keys():
-                _prd_lst[k] = torch.concat([t[k] for t in preds],dim=0)
+        # STUDENT CODE: Append prediction and actual values to dictionary
+        for k in preds[0].keys():
+            _prd_lst[k] = torch.concat([t[k] for t in preds],dim=0)
+            _act_lst[k] = torch.concat([t[k] for t in actuals], dim=0)
 
-                # STUDENT CODE: Append actual value to dictionary
-                _act_lst[k] = torch.concat([t[k] for t in actuals], dim=0)
+        if self.cache_preds:
+            # STUDENT CODE: Commented out as it is ran anyway for metric collection
+            pass
+            # for k in preds[0].keys():
+            #     _prd_lst[k] = torch.concat([t[k] for t in preds],dim=0)
 
         losses = losses/denom
 
