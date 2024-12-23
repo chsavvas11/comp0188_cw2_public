@@ -188,17 +188,21 @@ class TrainSingleEpoch:
 
         # STUDENT CODE: Compute metrics
         metrics = {}
+
+        int_act_grp = _act_lst["grp"].numpy().astype(int)
+        int_prd_grp = _prd_lst["grp"].numpy().astype(int)
+
         metrics["r2_pos"] = r2_score(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
         metrics["mse_pos"] = mean_squared_error(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
-        metrics["accuracy_grp"] = accuracy_score(_act_lst["grp"].numpy(), _prd_lst["grp"].numpy())
+        metrics["accuracy_grp"] = accuracy_score(int_act_grp, int_prd_grp)
         metrics["precision_grp"] = precision_score(
-            _act_lst["grp"].numpy(), 
-            _prd_lst["grp"].numpy(), 
+            int_act_grp, 
+            int_prd_grp, 
             average="weighted"
         )
         metrics["recall_grp"] = recall_score(
-            _act_lst["grp"].numpy(), 
-            _prd_lst["grp"].numpy(), 
+            int_act_grp, 
+            int_prd_grp, 
             average="weighted"
         )
 
