@@ -185,6 +185,8 @@ class TrainSingleEpoch:
         print(f"After conversion - Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}\n")
         print(f"After conversion - First few _act_lst['grp']: {_act_lst['grp'][:5]}\n")
         print(f"After conversion - First few _prd_lst['grp']: {_prd_lst['grp'][:5]}\n")
+        print(f"After conversion - First few as numpy _act_lst['grp']: {_act_lst['grp'].numpy()[:5]}\n")
+        print(f"After conversion - First few as numpy _prd_lst['grp']: {_prd_lst['grp'].numpy()[:5]}\n")
 
         # STUDENT CODE: Compute metrics
         metrics = {}
