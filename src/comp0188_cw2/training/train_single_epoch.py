@@ -1,6 +1,5 @@
 
 import torch
-import numpy as np
 from typing import Dict, Tuple
 import logging
 from tqdm import tqdm
@@ -85,10 +84,6 @@ class TrainSingleEpoch:
             )
         for i, vals in range_gen:
 
-            # STUDENT CODE: Print dictionary keys for debugging
-            print(f"Batch {i} - Input keys: {list(vals.input.keys())}\n")
-            print(f"Batch {i} - Output keys: {list(vals.output.keys())}\n")
-
             input_vals = vals.input
             output_vals = vals.output
             if gpu:
@@ -115,10 +110,6 @@ class TrainSingleEpoch:
                 train_loss = criterion(output, output_vals)
             if self.cache_preds:
 
-                # STUDENT CODE: Print dictionary keys for debugging
-                print(f"Batch {i} - Model output keys: {list(output.keys())}\n")
-                print(f"Batch {i} - Actual output keys: {list(output_vals.keys())}\n")
-
                 preds.append({k:output[k].detach().cpu() for k in output.keys()})
             
                 # STUDENT CODE: Keep track of actual value for each prediction
@@ -144,78 +135,34 @@ class TrainSingleEpoch:
 
         if self.cache_preds:
 
-            # STUDENT CODE: Print dictionary keys for debugging
-            print(f"Predictions keys: {list(preds[0].keys())}\n")
-            print(f"Actuals keys: {list(actuals[0].keys())}\n")
-
             for k in preds[0].keys():
                 _prd_lst[k] = torch.concat([t[k] for t in preds],dim=0)
         
                 # STUDENT CODE: Append actual value to dictionary
                 _act_lst[k] = torch.concat([t[k] for t in actuals], dim=0)
-
-        # STUDENT CODE: Print dictionary keys for debugging
-        print(f"Final Predictions keys: {list(_prd_lst.keys())}")
-        print(f"Final Actuals keys: {list(_act_lst.keys())}")
         
         losses = losses/denom
 
-        # STUDENT CODE: Print shapes for debugging
-        print(f"Shape of _act_lst['grp']: {_act_lst['grp'].shape}\n")
-        print(f"Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}\n")
-        print(f"Type of _act_lst['grp']: {type(_act_lst['grp'])}\n")
-        print(f"Type of _prd_lst['grp']: {type(_prd_lst['grp'])}\n")
-        print(f"First few _act_lst['grp']: {_act_lst['grp'][:5]}\n")
-        print(f"First few _prd_lst['grp']: {_prd_lst['grp'][:5]}\n")
-
         # STUDENT CODE: Convert classification predictions for metrics
         if "grp" in _prd_lst:
-
-            if len(_prd_lst["grp"].shape) > 1:  # Predicted probabilities/logits
+            if len(_prd_lst["grp"].shape) > 1: 
                 _prd_lst["grp"] = torch.argmax(_prd_lst["grp"], dim=1)
-            if len(_act_lst["grp"].shape) > 1:  # One-hot encoded ground truth
+            if len(_act_lst["grp"].shape) > 1:
                 _act_lst["grp"] = torch.argmax(_act_lst["grp"], dim=1)
-
-            print(f"Unique values in _prd_lst['grp']: {torch.unique(_prd_lst['grp'])}")
-            print(f"Data type of _prd_lst['grp']: {_prd_lst['grp'].dtype}")
-            print(f"Unique values in _act_lst['grp']: {torch.unique(_act_lst['grp'])}")
-            print(f"Data type of _act_lst['grp']: {_act_lst['grp'].dtype}")
-
-        # STUDENT CODE: Print shapes after conversions
-        print(f"After conversion - Shape of _act_lst['grp']: {_act_lst['grp'].shape}\n")
-        print(f"After conversion - Shape of _prd_lst['grp']: {_prd_lst['grp'].shape}\n")
-        print(f"After conversion - First few _act_lst['grp']: {_act_lst['grp'][:5]}\n")
-        print(f"After conversion - First few _prd_lst['grp']: {_prd_lst['grp'][:5]}\n")
-        print(f"After conversion - First few as numpy _act_lst['grp']: {_act_lst['grp'].numpy()[:5]}\n")
-        print(f"After conversion - First few as numpy _prd_lst['grp']: {_prd_lst['grp'].numpy()[:5]}\n")
 
         # STUDENT CODE: Compute metrics
         metrics = {}
-
         metrics["r2_pos"] = r2_score(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
         metrics["mse_pos"] = mean_squared_error(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
-
-        # Convert tensors to int64 numpy arrays
-        y_true = _act_lst["grp"].numpy().astype(np.int64)
-        y_pred = _prd_lst["grp"].numpy().astype(np.int64)
-
-        # Print shapes and values for debugging
-        print("Debug - y_true shape:", y_true.shape)
-        print("Debug - y_pred shape:", y_pred.shape)
-        print("Debug - y_true first few values:", y_true[:5])
-        print("Debug - y_pred first few values:", y_pred[:5])
-        print("Debug - y_true unique values:", np.unique(y_true))
-        print("Debug - y_pred unique values:", np.unique(y_pred))
-
-        metrics["accuracy_grp"] = accuracy_score(y_true, y_pred)
+        metrics["accuracy_grp"] = accuracy_score(_act_lst["grp"].numpy(), _prd_lst["grp"].numpy())
         metrics["precision_grp"] = precision_score(
-            y_true, 
-            y_pred, 
+            _act_lst["grp"].numpy(), 
+            _prd_lst["grp"].numpy(), 
             average="weighted"
         )
         metrics["recall_grp"] = recall_score(
-            y_true, 
-            y_pred, 
+            _act_lst["grp"].numpy(), 
+            _prd_lst["grp"].numpy(), 
             average="weighted"
         )
 

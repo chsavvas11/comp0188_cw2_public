@@ -120,6 +120,13 @@ class ValidateSingleEpoch:
 
         losses = losses/denom
 
+        # STUDENT CODE: Convert classification predictions for metrics
+        if "grp" in _prd_lst:
+            if len(_prd_lst["grp"].shape) > 1: 
+                _prd_lst["grp"] = torch.argmax(_prd_lst["grp"], dim=1)
+            if len(_act_lst["grp"].shape) > 1:
+                _act_lst["grp"] = torch.argmax(_act_lst["grp"], dim=1)
+
         # STUDENT CODE: Compute metrics
         metrics = {}
         metrics["r2_pos"] = r2_score(_act_lst["pos"].numpy(), _prd_lst["pos"].numpy())
